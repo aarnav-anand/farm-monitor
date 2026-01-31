@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm Monitor - Satellite & Weather Analysis</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1>🌾 Farm Monitor</h1>
+            <p class="subtitle">Satellite Health & Weather Analysis</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Instructions Panel -->
+            <div class="instruction-card">
+                <h2>📍 How to Use</h2>
+                <ol>
+                    <li>Zoom to your farm location on the map</li>
+                    <li>Click the <strong>polygon tool</strong> (⬟) to draw your field</li>
+                    <li>Click points to create the field boundary</li>
+                    <li>Enter farm details and click <strong>"Generate Report"</strong></li>
+                </ol>
+            </div>
+
+            <!-- Farm Details Form -->
+            <div class="form-card" id="farmForm" style="display: none;">
+                <h2>📋 Farm Details</h2>
+                <form id="detailsForm">
+                    <div class="form-group">
+                        <label for="farmName">Farm Name *</label>
+                        <input type="text" id="farmName" required placeholder="e.g., Green Valley Farm">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cropType">Crop Type *</label>
+                        <select id="cropType" required>
+                            <option value="">Select crop...</option>
+                            <option value="wheat">Wheat</option>
+                            <option value="corn">Corn/Maize</option>
+                            <option value="rice">Rice</option>
+                            <option value="soybean">Soybean</option>
+                            <option value="cotton">Cotton</option>
+                            <option value="vegetables">Vegetables</option>
+                            <option value="fruit">Fruit Trees</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email (optional)</label>
+                        <input type="email" id="email" placeholder="your@email.com">
+                        <small>Receive report via email</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="plantingDate">Planting Date (optional)</label>
+                        <input type="date" id="plantingDate">
+                        <small>Helps determine crop growth stage</small>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary" id="generateBtn">
+                        <span class="btn-text">🛰️ Generate Report</span>
+                        <span class="btn-loader" style="display: none;">⏳ Processing...</span>
+                    </button>
+                </form>
+                
+                <div class="stats" id="fieldStats">
+                    <p><strong>Field Area:</strong> <span id="areaDisplay">-</span> hectares</p>
+                    <p><strong>Coordinates:</strong> <span id="coordsDisplay">-</span></p>
+                </div>
+            </div>
+
+            <!-- Map Container -->
+            <div class="map-card">
+                <div id="map"></div>
+                <div class="map-controls">
+                    <button class="btn-secondary" id="clearBtn" style="display: none;">🗑️ Clear Field</button>
+                    <button class="btn-secondary" id="locateBtn">📍 Find My Location</button>
+                </div>
+            </div>
+
+            <!-- Loading Modal -->
+            <div id="loadingModal" class="modal">
+                <div class="modal-content">
+                    <div class="loader"></div>
+                    <h3>Analyzing Your Farm...</h3>
+                    <p id="loadingStatus">Connecting to satellite...</p>
+                    <div class="progress-steps">
+                        <div class="step" id="step1">📡 Fetching satellite data</div>
+                        <div class="step" id="step2">🌦️ Retrieving weather data</div>
+                        <div class="step" id="step3">🧮 Calculating NDVI</div>
+                        <div class="step" id="step4">📄 Generating PDF report</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result Modal -->
+            <div id="resultModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" id="closeResult">&times;</span>
+                    <h2>✅ Report Ready!</h2>
+                    <div id="reportPreview"></div>
+                    <a href="#" id="downloadLink" class="btn-primary" download>📥 Download PDF Report</a>
+                    <button class="btn-secondary" id="newReportBtn">🔄 Create New Report</button>
+                </div>
+            </div>
+
+            <!-- Error Modal -->
+            <div id="errorModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" id="closeError">&times;</span>
+                    <h2>⚠️ Error</h2>
+                    <p id="errorMessage"></p>
+                    <button class="btn-secondary" id="retryBtn">🔄 Try Again</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>Powered by Sentinel-2 🛰️ | Open-Meteo 🌦️ | OpenStreetMap 🗺️</p>
+            <p class="small">Free & Open Source Farm Monitoring</p>
+        </div>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="js/map.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

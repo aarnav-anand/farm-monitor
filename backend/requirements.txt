@@ -1,0 +1,40 @@
+# FastAPI and Server
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# CORS support
+fastapi-cors==0.0.6
+
+# Data Processing
+numpy==1.26.3
+pandas==2.2.0
+
+# Google Earth Engine
+earthengine-api==0.1.384
+
+# Weather Data
+requests==2.31.0
+openmeteo-requests==1.1.0
+retry-requests==2.0.0
+
+# PDF Generation
+reportlab==4.0.9
+Pillow==10.2.0
+
+# Environment Variables
+python-dotenv==1.0.1
+
+# Date/Time
+python-dateutil==2.8.2
+
+# JSON Schema validation
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# HTTP Client
+httpx==0.26.0
+
+# Geospatial
+shapely==2.0.2
+geopy==2.4.1

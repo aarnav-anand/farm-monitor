@@ -5,7 +5,7 @@
 // Configuration
 // When deployed: set PRODUCTION_API_URL below to your Render backend URL (e.g. https://farm-monitor-api.onrender.com).
 // Local: uses http://localhost:8000 automatically.
-const PRODUCTION_API_URL = 'https://your-app.onrender.com'; // Replace with your Render URL when deploying
+const PRODUCTION_API_URL = 'https://farm-monitor-api.onrender.com'; // Replace with your Render URL when deploying
 const API_CONFIG = {
     baseURL: (typeof window !== 'undefined' && window.location && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1')
         ? PRODUCTION_API_URL

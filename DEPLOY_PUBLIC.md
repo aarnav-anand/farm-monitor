@@ -37,6 +37,7 @@ git push -u origin main
 5. **Environment** (in Render dashboard):
    - Add **Secret File**: name `gee-credentials.json`, paste the contents of your local `backend/gee-credentials.json`.
    - If your code reads from a path, set **GEE_CREDENTIALS_PATH** to the path Render gives (e.g. `/etc/secrets/gee-credentials.json`), or match what your app expects.
+   - **If the build fails** (e.g. pandas/numpy errors): add **Environment Variable** `PYTHON_VERSION` = `3.11.9` (the app uses Python 3.11; Render’s default 3.13 is not supported by pandas 2.2).
 6. Create the service. Wait for the first deploy (a few minutes).
 7. Copy your backend URL, e.g. **`https://farm-monitor-api.onrender.com`**.
 

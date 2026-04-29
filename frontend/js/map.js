@@ -7,6 +7,25 @@ let drawnItems;
 let drawControl;
 let currentPolygon = null;
 
+function safeInvalidateMapSize() {
+    if (!map) return;
+    // Run a few times to survive late layout shifts (fonts, scrollbars, etc.).
+    const run = () => {
+        try {
+            map.invalidateSize(true);
+            // A no-op pan forces Leaflet to re-evaluate tile positions in some edge cases.
+            map.panBy([0, 0], { animate: false });
+        } catch (e) {
+            // ignore
+        }
+    };
+    // Immediate + delayed passes
+    run();
+    setTimeout(run, 50);
+    setTimeout(run, 250);
+    setTimeout(run, 1000);
+}
+
 // Initialize the map
 function initMap() {
     // Create map centered on a default location
@@ -16,9 +35,12 @@ function initMap() {
     // NOTE: The public OpenStreetMap tile server can return 403 (referer required / rate limits)
     // depending on hosting and usage. CARTO's basemaps are more reliable for apps.
     // "Voyager" is more colorful than "light_all" while still fast.
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    const baseTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-        maxZoom: 19
+        maxZoom: 19,
+        // Helps avoid half-painted maps on some GPUs/browsers
+        updateWhenIdle: true,
+        keepBuffer: 4
     }).addTo(map);
     
     // Initialize drawn items layer
@@ -59,6 +81,22 @@ function initMap() {
     
     // Event listeners for drawing
     setupDrawingEvents();
+
+    // Leaflet can render only part of the map if the container size changes
+    // (e.g. after fonts load, scrollbar appears, or the page layout shifts).
+    safeInvalidateMapSize();
+    // Once everything is fully loaded (CSS/fonts), reflow again.
+    window.addEventListener('load', safeInvalidateMapSize, { once: true });
+    window.addEventListener('resize', safeInvalidateMapSize);
+
+    const mapEl = document.getElementById('map');
+    if (mapEl && window.ResizeObserver) {
+        const ro = new ResizeObserver(() => safeInvalidateMapSize());
+        ro.observe(mapEl);
+    }
+
+    // When the first batch of tiles finishes loading, force a final reflow.
+    baseTiles.on('load', safeInvalidateMapSize);
 }
 
 // Setup drawing event listeners

@@ -18,6 +18,7 @@ from services.weather import WeatherService
 from services.satellite import SatelliteService
 from services.analysis import AgronomicAnalyzer
 from services.pdf_gen import PDFGenerator
+from services.localization import normalize_lang
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -68,9 +69,15 @@ class FarmReportRequest(BaseModel):
     crop_type: str = Field(..., min_length=1)
     email: Optional[str] = None
     planting_date: Optional[str] = None
+    language: Optional[str] = Field(default="en", description="Report language: en, hi, gu")
     polygon: PolygonCoordinates
     area: float = Field(..., gt=0)
     center: CenterPoint
+
+    @field_validator("language", mode="before")
+    @classmethod
+    def normalize_language(cls, v: object) -> str:
+        return normalize_lang(v if isinstance(v, str) else None)
 
 class FarmReportResponse(BaseModel):
     farm_name: str
@@ -156,7 +163,8 @@ async def generate_report(request: FarmReportRequest, background_tasks: Backgrou
             satellite_data=satellite_data,
             crop_type=request.crop_type,
             planting_date=request.planting_date,
-            area=request.area
+            area=request.area,
+            language=request.language
         )
         
         # 4. Generate PDF Report
@@ -168,7 +176,8 @@ async def generate_report(request: FarmReportRequest, background_tasks: Backgrou
             center={'lat': center_lat, 'lng': center_lng},
             weather_data=weather_data,
             satellite_data=satellite_data,
-            analysis=analysis
+            analysis=analysis,
+            language=request.language
         )
         
         # 5. Prepare response

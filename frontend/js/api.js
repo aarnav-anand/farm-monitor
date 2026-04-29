@@ -7,9 +7,14 @@
 // Local: uses http://localhost:8000 automatically.
 const PRODUCTION_API_URL = 'https://farm-monitor-api.onrender.com'; // Replace with your Render URL when deploying
 const API_CONFIG = {
-    baseURL: (typeof window !== 'undefined' && window.location && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1')
-        ? PRODUCTION_API_URL
-        : 'http://localhost:8000',
+    // When opened via file://, window.location.hostname is empty and we should default to local backend.
+    baseURL: (function () {
+        if (typeof window === 'undefined' || !window.location) return 'http://localhost:8000';
+        if (window.location.protocol === 'file:') return 'http://localhost:8000';
+        const host = window.location.hostname;
+        if (host === 'localhost' || host === '127.0.0.1') return 'http://localhost:8000';
+        return PRODUCTION_API_URL;
+    })(),
     timeout: 120000 // 2 minutes timeout for satellite processing
 };
 
@@ -81,26 +86,26 @@ async function downloadPDF(pdfUrl, filename) {
         
     } catch (error) {
         console.error('Download error:', error);
-        throw new Error('Failed to download PDF');
+        throw new Error(window.I18N ? window.I18N.t('err_download_pdf') : 'Failed to download PDF');
     }
 }
 
 // Validate form data before sending
 function validateFarmData(data) {
     if (!data.polygon || !data.polygon.coordinates) {
-        throw new Error('Please draw a field polygon on the map');
+        throw new Error(window.I18N ? window.I18N.t('err_draw_field_polygon') : 'Please draw a field polygon on the map');
     }
     
     if (!data.farm_name || data.farm_name.trim() === '') {
-        throw new Error('Please enter a farm name');
+        throw new Error(window.I18N ? window.I18N.t('err_enter_farm_name') : 'Please enter a farm name');
     }
     
     if (!data.crop_type || data.crop_type === '') {
-        throw new Error('Please select a crop type');
+        throw new Error(window.I18N ? window.I18N.t('err_select_crop') : 'Please select a crop type');
     }
     
     if (data.email && !isValidEmail(data.email)) {
-        throw new Error('Please enter a valid email address');
+        throw new Error(window.I18N ? window.I18N.t('err_valid_email') : 'Please enter a valid email address');
     }
     
     return true;
@@ -119,7 +124,7 @@ function parseApiErrorDetail(detail) {
     if (Array.isArray(detail)) {
         return detail
             .map(function (d) { return d.msg || (typeof d === 'string' ? d : JSON.stringify(d)); })
-            .join('. ') || 'Request validation failed. Please check your inputs.';
+            .join('. ') || (window.I18N ? window.I18N.t('err_request_validation_failed') : 'Request validation failed. Please check your inputs.');
     }
     if (typeof detail === 'object') return detail.message || detail.msg || JSON.stringify(detail);
     return String(detail);
@@ -139,7 +144,7 @@ function formatErrorMessage(error) {
         return parseApiErrorDetail(error.detail);
     }
     
-    return 'An unexpected error occurred. Please try again.';
+    return window.I18N ? window.I18N.t('err_unexpected') : 'An unexpected error occurred. Please try again.';
 }
 
 // Check if backend is available
@@ -148,8 +153,10 @@ async function ensureBackendAvailable() {
     
     if (!isHealthy) {
         throw new Error(
-            'Unable to connect to the server. The free tier may be sleeping. ' +
-            'Please wait 30-60 seconds and try again.'
+            window.I18N
+                ? window.I18N.t('err_backend_sleeping')
+                : ('Unable to connect to the server. The free tier may be sleeping. ' +
+                    'Please wait 30-60 seconds and try again.')
         );
     }
     

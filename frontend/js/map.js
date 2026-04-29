@@ -12,9 +12,12 @@ function initMap() {
     // Create map centered on a default location
     map = L.map('map').setView([20.5937, 78.9629], 5); // India center
     
-    // Add OpenStreetMap tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
+    // Add basemap tiles.
+    // NOTE: The public OpenStreetMap tile server can return 403 (referer required / rate limits)
+    // depending on hosting and usage. CARTO's basemaps are more reliable for apps.
+    // "Voyager" is more colorful than "light_all" while still fast.
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
         maxZoom: 19
     }).addTo(map);
     
@@ -30,7 +33,7 @@ function initMap() {
                 allowIntersection: false,
                 drawError: {
                     color: '#e76f51',
-                    message: '<strong>Error:</strong> Shape edges cannot cross!'
+                    message: '<strong>' + (window.I18N ? window.I18N.t('error_title') : 'Error') + ':</strong> Shape edges cannot cross!'
                 },
                 shapeOptions: {
                     color: '#2d6a4f',
@@ -140,9 +143,10 @@ function showFarmForm() {
 // Hide farm details form
 function hideFarmForm() {
     document.getElementById('farmForm').style.display = 'none';
+    const t = (k) => (window.I18N ? window.I18N.t(k) : k);
     document.getElementById('fieldStats').innerHTML = `
-        <p><strong>Field Area:</strong> <span id="areaDisplay">-</span> hectares</p>
-        <p><strong>Coordinates:</strong> <span id="coordsDisplay">-</span></p>
+        <p><strong>${t('field_area_label')}</strong> <span id="areaDisplay">-</span> hectares</p>
+        <p><strong>${t('coordinates_label')}</strong> <span id="coordsDisplay">-</span></p>
     `;
 }
 
@@ -168,18 +172,19 @@ function locateUser() {
                 
                 // Add a temporary marker
                 const marker = L.marker([lat, lng]).addTo(map);
-                marker.bindPopup('📍 You are here!').openPopup();
+                marker.bindPopup('📍 ' + (window.I18N ? window.I18N.t('map_you_are_here') : 'You are here!')).openPopup();
                 
                 setTimeout(() => {
                     map.removeLayer(marker);
                 }, 5000);
             },
             function(error) {
-                alert('Unable to get your location: ' + error.message);
+                const prefix = window.I18N ? window.I18N.t('geo_unavailable_prefix') : 'Unable to get your location: ';
+                alert(prefix + error.message);
             }
         );
     } else {
-        alert('Geolocation is not supported by your browser');
+        alert(window.I18N ? window.I18N.t('geo_not_supported') : 'Geolocation is not supported by your browser');
     }
 }
 

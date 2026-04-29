@@ -12,6 +12,11 @@ let detailsForm;
 
 // Initialize application
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize i18n first so initial UI is translated before user interacts
+    if (window.I18N && typeof window.I18N.init === 'function') {
+        window.I18N.init();
+    }
+
     // Get DOM elements
     loadingModal = document.getElementById('loadingModal');
     resultModal = document.getElementById('resultModal');
@@ -95,14 +100,14 @@ async function handleFormSubmit(event) {
         showLoadingModal();
         
         // Check if backend is available
-        updateLoadingStatus('Connecting to server...');
+        updateLoadingStatus(window.I18N ? window.I18N.t('loading_status_connecting_server') : 'Connecting to server...');
         await window.API.ensureBackendAvailable();
         
         // Start progress tracking
         progressTracker.start();
         
         // Generate report
-        updateLoadingStatus('Processing your request...');
+        updateLoadingStatus(window.I18N ? window.I18N.t('loading_status_processing') : 'Processing your request...');
         const result = await window.API.generateReport(farmData);
         
         // Mark all steps complete
@@ -138,7 +143,7 @@ function collectFormData() {
     const polygon = window.farmPolygon;
     
     if (!polygon) {
-        throw new Error('Please draw a field on the map first');
+        throw new Error(window.I18N ? window.I18N.t('err_draw_field_first') : 'Please draw a field on the map first');
     }
     
     // Get form values
@@ -152,6 +157,7 @@ function collectFormData() {
         crop_type: cropType,
         email: email || null,
         planting_date: plantingDate || null,
+        language: window.I18N ? window.I18N.getLanguage() : 'en',
         polygon: {
             type: polygon.type,
             coordinates: ensurePolygonRings(polygon.coordinates)
@@ -176,16 +182,17 @@ function updateLoadingStatus(message) {
 function showResultModal(result) {
     // Populate preview
     const preview = document.getElementById('reportPreview');
+    const t = (k) => (window.I18N ? window.I18N.t(k) : k);
     preview.innerHTML = `
-        <h3>📊 Report Summary</h3>
-        <p><strong>Farm:</strong> ${result.farm_name}</p>
-        <p><strong>Crop:</strong> ${result.crop_type}</p>
-        <p><strong>Area:</strong> ${result.area} hectares</p>
-        <p><strong>NDVI:</strong> ${result.ndvi_value || 'N/A'}</p>
-        <p><strong>Health Status:</strong> ${result.health_status || 'Good'}</p>
+        <h3>📊 ${t('report_summary_title')}</h3>
+        <p><strong>${t('report_farm')}</strong> ${result.farm_name}</p>
+        <p><strong>${t('report_crop')}</strong> ${result.crop_type}</p>
+        <p><strong>${t('report_area')}</strong> ${result.area} hectares</p>
+        <p><strong>${t('report_ndvi')}</strong> ${result.ndvi_value || 'N/A'}</p>
+        <p><strong>${t('report_health')}</strong> ${result.health_status || 'Good'}</p>
         ${result.recommendations ? `
             <div style="margin-top: 1rem; padding: 1rem; background: #fff3cd; border-radius: 8px;">
-                <strong>🌾 Recommendations:</strong>
+                <strong>🌾 ${t('report_recommendations')}</strong>
                 <p style="margin-top: 0.5rem;">${result.recommendations}</p>
             </div>
         ` : ''}
@@ -197,14 +204,16 @@ function showResultModal(result) {
         downloadLink.href = result.pdf_url;
         downloadLink.onclick = function(e) {
             e.preventDefault();
-            window.API.downloadPDF(result.pdf_url, `${result.farm_name}_report.pdf`);
+            const suffix = window.I18N ? window.I18N.t('pdf_filename_suffix') : 'report';
+            window.API.downloadPDF(result.pdf_url, `${result.farm_name}_${suffix}.pdf`);
         };
     } else if (result.pdf_base64) {
         // Handle base64 PDF
         const blob = base64toBlob(result.pdf_base64, 'application/pdf');
         const url = URL.createObjectURL(blob);
         downloadLink.href = url;
-        downloadLink.download = `${result.farm_name}_report.pdf`;
+        const suffix = window.I18N ? window.I18N.t('pdf_filename_suffix') : 'report';
+        downloadLink.download = `${result.farm_name}_${suffix}.pdf`;
     }
     
     resultModal.classList.add('active');

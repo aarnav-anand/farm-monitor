@@ -16,8 +16,16 @@
     <!-- Header -->
     <header class="header">
         <div class="container">
-            <h1>🌾 Farm Monitor</h1>
-            <p class="subtitle">Satellite Health & Weather Analysis</p>
+            <div class="header-row">
+                <div class="header-title">
+                    <h1>🌾 <span data-i18n="app_title">Farm Monitor</span></h1>
+                    <p class="subtitle" data-i18n="app_subtitle">Satellite Health & Weather Analysis</p>
+                </div>
+                <div class="header-language">
+                    <label for="languageSelect" class="language-label" data-i18n="language_label">Language</label>
+                    <select id="languageSelect" class="language-select" aria-label="Language select"></select>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -26,28 +34,28 @@
         <div class="container">
             <!-- Instructions Panel -->
             <div class="instruction-card">
-                <h2>📍 How to Use</h2>
+                <h2>📍 <span data-i18n="how_to_use_title">How to Use</span></h2>
                 <ol>
-                    <li>Zoom to your farm location on the map</li>
-                    <li>Click the <strong>polygon tool</strong> (⬟) to draw your field</li>
-                    <li>Click points to create the field boundary</li>
-                    <li>Enter farm details and click <strong>"Generate Report"</strong></li>
+                    <li data-i18n="how_to_use_1">Zoom to your farm location on the map</li>
+                    <li data-i18n="how_to_use_2">Click the polygon tool (⬟) to draw your field</li>
+                    <li data-i18n="how_to_use_3">Click points to create the field boundary</li>
+                    <li data-i18n="how_to_use_4">Enter farm details and click "Generate Report"</li>
                 </ol>
             </div>
 
             <!-- Farm Details Form -->
             <div class="form-card" id="farmForm" style="display: none;">
-                <h2>📋 Farm Details</h2>
+                <h2>📋 <span data-i18n="farm_details_title">Farm Details</span></h2>
                 <form id="detailsForm">
                     <div class="form-group">
-                        <label for="farmName">Farm Name *</label>
-                        <input type="text" id="farmName" required placeholder="e.g., Green Valley Farm">
+                        <label for="farmName" data-i18n="farm_name_label">Farm Name *</label>
+                        <input type="text" id="farmName" required data-i18n-placeholder="farm_name_placeholder" placeholder="e.g., Green Valley Farm">
                     </div>
                     
                     <div class="form-group">
-                        <label for="cropType">Crop Type *</label>
+                        <label for="cropType" data-i18n="crop_type_label">Crop Type *</label>
                         <select id="cropType" required>
-                            <option value="">Select crop...</option>
+                            <option value="" data-i18n="crop_select_placeholder">Select crop...</option>
                             <option value="wheat">Wheat</option>
                             <option value="corn">Corn/Maize</option>
                             <option value="rice">Rice</option>
@@ -60,26 +68,27 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="email">Email (optional, we try our best to deliver the maximum amount of emails we can.)</label>
-                        <input type="email" id="email" placeholder="your@email.com">
-                        <small>Receive report via email</small>
+                        <label for="email" data-i18n="email_label">Email (optional)</label>
+                        <input type="email" id="email" data-i18n-placeholder="email_placeholder" placeholder="your@email.com">
+                        <small data-i18n="email_help">Receive report via email</small>
+                        <small data-i18n="email_delivery_note">We try our best to deliver emails, but delivery is not guaranteed.</small>
                     </div>
                     
                     <div class="form-group">
-                        <label for="plantingDate">Planting Date (optional)</label>
+                        <label for="plantingDate" data-i18n="planting_date_label">Planting Date (optional)</label>
                         <input type="date" id="plantingDate">
-                        <small>Helps determine crop growth stage</small>
+                        <small data-i18n="planting_date_help">Helps determine crop growth stage</small>
                     </div>
                     
                     <button type="submit" class="btn-primary" id="generateBtn">
-                        <span class="btn-text">🛰️ Generate Report</span>
-                        <span class="btn-loader" style="display: none;">⏳ Processing...</span>
+                        <span class="btn-text">🛰️ <span data-i18n="generate_report">Generate Report</span></span>
+                        <span class="btn-loader" style="display: none;">⏳ <span data-i18n="processing">Processing...</span></span>
                     </button>
                 </form>
                 
                 <div class="stats" id="fieldStats">
-                    <p><strong>Field Area:</strong> <span id="areaDisplay">-</span> hectares</p>
-                    <p><strong>Coordinates:</strong> <span id="coordsDisplay">-</span></p>
+                    <p><strong><span data-i18n="field_area_label">Field Area:</span></strong> <span id="areaDisplay">-</span> hectares</p>
+                    <p><strong><span data-i18n="coordinates_label">Coordinates:</span></strong> <span id="coordsDisplay">-</span></p>
                 </div>
             </div>
 
@@ -87,8 +96,8 @@
             <div class="map-card">
                 <div id="map"></div>
                 <div class="map-controls">
-                    <button class="btn-secondary" id="clearBtn" style="display: none;">🗑️ Clear Field</button>
-                    <button class="btn-secondary" id="locateBtn">📍 Find My Location</button>
+                    <button class="btn-secondary" id="clearBtn" style="display: none;">🗑️ <span data-i18n="clear_field">Clear Field</span></button>
+                    <button class="btn-secondary" id="locateBtn">📍 <span data-i18n="find_my_location">Find My Location</span></button>
                 </div>
             </div>
 
@@ -96,13 +105,13 @@
             <div id="loadingModal" class="modal">
                 <div class="modal-content">
                     <div class="loader"></div>
-                    <h3>Analyzing Your Farm...</h3>
-                    <p id="loadingStatus">Connecting to satellite...</p>
+                    <h3 data-i18n="loading_title">Analyzing Your Farm...</h3>
+                    <p id="loadingStatus" data-i18n="loading_status_connecting_satellite">Connecting to satellite...</p>
                     <div class="progress-steps">
-                        <div class="step" id="step1">📡 Fetching satellite data</div>
-                        <div class="step" id="step2">🌦️ Retrieving weather data</div>
-                        <div class="step" id="step3">🧮 Calculating NDVI</div>
-                        <div class="step" id="step4">📄 Generating PDF report</div>
+                        <div class="step" id="step1">📡 <span data-i18n="step1">Fetching satellite data</span></div>
+                        <div class="step" id="step2">🌦️ <span data-i18n="step2">Retrieving weather data</span></div>
+                        <div class="step" id="step3">🧮 <span data-i18n="step3">Calculating NDVI</span></div>
+                        <div class="step" id="step4">📄 <span data-i18n="step4">Generating PDF report</span></div>
                     </div>
                 </div>
             </div>
@@ -111,10 +120,10 @@
             <div id="resultModal" class="modal">
                 <div class="modal-content">
                     <span class="close" id="closeResult">&times;</span>
-                    <h2>✅ Report Ready!</h2>
+                    <h2>✅ <span data-i18n="result_title">Report Ready!</span></h2>
                     <div id="reportPreview"></div>
-                    <a href="#" id="downloadLink" class="btn-primary" download>📥 Download PDF Report</a>
-                    <button class="btn-secondary" id="newReportBtn">🔄 Create New Report</button>
+                    <a href="#" id="downloadLink" class="btn-primary" download>📥 <span data-i18n="download_pdf">Download PDF Report</span></a>
+                    <button class="btn-secondary" id="newReportBtn">🔄 <span data-i18n="new_report">Create New Report</span></button>
                 </div>
             </div>
 
@@ -122,10 +131,12 @@
             <div id="errorModal" class="modal">
                 <div class="modal-content">
                     <span class="close" id="closeError">&times;</span>
-                    <h2>⚠️ Error</h2>
+                    <h2>⚠️ <span data-i18n="error_title">Error</span></h2>
                     <p id="errorMessage"></p>
-                    <h4> NOTE: Due to financial constraints, our backend is hosted on a sharing-server, so it may take our server 30-60 seconds to reboot after inactivity, please consider re-analyzing after 60 seconds. </h4>
-                    <button class="btn-secondary" id="retryBtn">🔄 Try Again</button>
+                    <button class="btn-secondary" id="retryBtn">🔄 <span data-i18n="try_again">Try Again</span></button>
+                    <p class="small mt-2" data-i18n="backend_wake_note">
+                        Note: Our free backend may take 30–60 seconds to wake up after inactivity. If it fails, please try again after 60 seconds.
+                    </p>
                 </div>
             </div>
         </div>
@@ -145,6 +156,7 @@
     
     <!-- Custom JS -->
     <script src="js/map.js"></script>
+    <script src="js/i18n.js"></script>
     <script src="js/api.js"></script>
     <script src="js/app.js"></script>
 </body>
